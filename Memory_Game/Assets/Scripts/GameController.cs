@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -59,4 +60,59 @@ public class GameController : MonoBehaviour
             }
         }
     }
+
+    private Main_Image primeiraEscolha;
+    private Main_Image segundaEscolha;
+
+    private int pontuacao = 0;
+    private int tentativas = 0;
+
+    [SerializeField] private TextMesh pontuacaoText;
+    [SerializeField] private TextMesh tentativasText;
+
+    public bool canOpen 
+    {
+        get { return segundaEscolha == null; }
+    }
+
+    public void imageOpener(Main_Image startObject) 
+    {
+        if(primeiraEscolha == null) 
+        {
+            primeiraEscolha = startObject;
+        }
+        else 
+        {
+            segundaEscolha = startObject;
+            StartCoroutine(CheckGuessed());
+        }
+    }
+
+    private IEnumerator CheckGuessed() 
+    {
+        if (primeiraEscolha.spriteId == segundaEscolha.spriteId)  //Compara os dois objetos
+        {
+            pontuacao++; //Adiciona um ponto
+            pontuacaoText.text = "Pontuação: " + pontuacao;
+        }
+        else 
+        {
+            yield return new WaitForSeconds(0.5f); //Inicia o contador de tempo
+
+            primeiraEscolha.Close();
+            segundaEscolha.Close();
+        }
+
+        tentativas++;
+        tentativasText.text = "Tentativas: " + tentativas;
+
+        primeiraEscolha = null;
+        segundaEscolha = null;
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene("MainScene");
+    }
+
 }
